@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="bod">
+        <div class="man">
+            <h2>UDDOG ID</h2>
+            <p id="errorMessage"></p>
+            <form id="loginForm">
+                <input autocomplete="off" placeholder="ENTER USERNAME" type="text" id="username" name="username" required><br>
+                <button type="button" onclick="attemptLogin()">Login</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        function attemptLogin() {
+            const usernameInput = document.getElementById('username');
+            const username = usernameInput.value.trim();
+            const errorMessageElement = document.getElementById('errorMessage');
+            errorMessageElement.textContent = ''; // Clear previous error message
+
+            const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRm48hnUwaJhf04Q7c-QOWvVSLCWCghP2lIihDV-kCSTAoKROFRQn6kaeLoRXjQ7bLKW2Rz12oYcRaT/pub?output=csv&gid=1000375812';
+
+            // Fetch data from CSV
+            fetch(csvUrl)
+                .then(response => response.text())
+                .then(data => {
+                    const rows = data.split('\n').map(row => row.split(','));
+
+                    // Loop through the rows to check for matching credentials, starting from index 1 (skipping the first row)
+                    let isValid = false;
+                    let rowIndex;
+
+                    for (let i = 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        console.log('Checking:', row[2]); // Assuming username is in column C
+                        if (row[2] === username) {
+                            isValid = true;
+                            rowIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (isValid) {
+                        // Save row index to localStorage
+                        localStorage.setItem('rowIndex', rowIndex);
+
+                        // Redirect to the profiles.html page
+                        window.location.href = 'https://lasmanknia.github.io/test72/profiles.html';
+                    } else {
+                        errorMessageElement.textContent = 'Wrong username. Please try again.';
+                    }
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Check if there is a saved row index in localStorage
+        const savedRowIndex = localStorage.getItem('rowIndex');
+        if (savedRowIndex) {
+            // If a row index is saved, you might want to handle it accordingly (e.g., redirect or perform some action)
+            console.log('Saved row index:', savedRowIndex);
+        }
+    </script>
+</body>
+
+</html>

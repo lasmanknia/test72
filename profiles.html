@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UDDOG ID</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+      async function checkCredentials() {
+            const enteredPassword = document.getElementById("password").value.trim().toLowerCase();
+
+            const storedRowIndex = parseInt(localStorage.getItem('rowIndex'), 10);
+
+            if (!storedRowIndex) {
+                alert("No stored row index found. Please enter your credentials.");
+                return;
+            }
+
+            const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRm48hnUwaJhf04Q7c-QOWvVSLCWCghP2lIihDV-kCSTAoKROFRQn6kaeLoRXjQ7bLKW2Rz12oYcRaT/pub?output=csv&gid=1000375812';
+
+            try {
+                const response = await fetch(csvUrl);
+                const data = await response.text();
+                const rows = data.split('\n').map(row => row.split(','));
+
+                // Fetch the row using the saved index
+                const storedRow = rows[storedRowIndex];
+
+                // Checking password in column G (index 6)
+                if (storedRow && storedRow[6].trim().toLowerCase() === enteredPassword) {
+    // Correct credentials, show the content
+    document.getElementById("login-form").style.display = "none";
+    document.getElementById("content").style.display = "block";
+
+    // Extract additional information
+    const imgSrc = storedRow[18].trim(); // Use column S for image source
+    const name = storedRow[3].trim(); // Use column D for name
+    const fatherName = storedRow[5].trim(); // Use column F for father's name
+    const address = storedRow[10].trim(); // Use column K for address
+    const joiningDate = storedRow[19].trim(); // Use column T for joining date
+    const totalDonation = storedRow[20].trim(); // Use column U for total donation
+    const dateOfBirth = storedRow[8].trim(); // Use column I for date of birth
+    const bloodGroup = storedRow[11].trim(); // Use column L for blood group
+    const message = storedRow[21].trim(); // Use column V for message
+    const attendedEvents = storedRow[22].trim(); // Use column W for attended events
+    const role = storedRow[0].trim(); // Use column A for role
+    // Extract additional information from column R (index 17) for blood donation times
+    const bloodDonationTimes = storedRow[17].trim();
+
+    // Display profile information
+    document.getElementById("profile").innerHTML = `
+    <div class="s1">
+        <img src="${imgSrc}" alt="Profile Image">
+        <p>${name}</p>
+        <p>${role}</p>
+    </div>
+    <div class="s2">
+            <p>Events<br>${attendedEvents}</p>
+            <p>Donation<br>${totalDonation} TK</p>
+            <p>BD Score<br>${bloodDonationTimes}</p>
+    </div>
+    <div class="s3">
+            <p>Bload Group</p>
+            <p>${bloodGroup}</p>
+            <p>Date of Birth</p>
+            <p>${dateOfBirth}</p>
+            <p>Father's Name</p>
+            <p>${fatherName}</p>
+            <p>Address</p>
+            <p>${address}</p>
+            <p>Joining Date</p>
+            <p>${joiningDate}</p>
+    </div>
+    <div class="s4">
+        <p>Message for ${name} from UDDOG</p>
+        <p>${message}</p>
+    </div>
+    `;
+
+    return; // Exit the loop once credentials are found
+}
+
+                // If the entered password does not match the stored password, show an error message
+                document.getElementById("error-message").textContent = "Wrong password. Please try again.";
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Check if there is a saved row index in localStorage
+        const storedRowIndex = localStorage.getItem('rowIndex');
+        if (storedRowIndex) {
+            // If a row index is saved, automatically check credentials
+            checkCredentials();
+        }
+    </script>
+</head>
+
+<body>
+
+    <div class="bod" id="login-form">
+        <div class="man">
+            <h2>Enter Your UDDOG Password</h2>
+            <input placeholder="Enter password" type="password" id="password" />
+            <button onclick="checkCredentials()">Login</button>
+            <p id="error-message" style="color: red;"></p>
+        </div>
+    </div>
+
+    <div id="content" style="display: none;">
+        <div id="profile">
+            <!-- Profile information will be displayed here -->
+     </div>
+    </div>
+
+</body>
+
+</html>

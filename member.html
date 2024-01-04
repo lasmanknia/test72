@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profiles</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        #profiles-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .profile {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 10px;
+            width: 200px;
+            text-align: center;
+            margin: 10px;
+        }
+
+        .profile img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .profile h2 {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="profiles-container"></div>
+
+    <script>
+        // Function to fetch and process CSV data
+        function fetchCSVData() {
+            // Replace 'YOUR_CSV_URL' with the actual URL of your CSV file
+            const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRm48hnUwaJhf04Q7c-QOWvVSLCWCghP2lIihDV-kCSTAoKROFRQn6kaeLoRXjQ7bLKW2Rz12oYcRaT/pub?output=csv';
+
+            fetch(csvUrl)
+                .then(response => response.text())
+                .then(data => {
+                    const rows = data.split('\n');
+                    const headers = rows[0].split(',');
+
+                    // Loop through each row (starting from 1 to skip headers)
+                    for (let i = 1; i < rows.length; i++) {
+                        const values = rows[i].split(',');
+
+                        // Assuming 'J' column contains the address information
+                        const address = values[9]; // Use index 9 for the 'J' column
+
+                        // Assuming 'K' column contains the blood group information
+                        const bloodGroup = values[10]; // Use index 10 for the 'K' column
+
+                        // Assuming 'Q' column contains the number of times donated blood
+                        const donations = values[16]; // Use index 16 for the 'Q' column
+
+                        // Assuming 'R' column contains the image URLs
+                        const imageUrl = values[17]; // Use index 17 for the 'R' column
+
+                        // Create a profile HTML element for each row with an image
+                        createProfile(values[3], address, bloodGroup, donations, imageUrl);
+                    }
+                })
+                .catch(error => console.error('Error fetching CSV data:', error));
+        }
+
+        // Function to create a profile based on the name, address, blood group, donations, and image URL
+        function createProfile(name, address, bloodGroup, donations, imageUrl) {
+            const profilesContainer = document.getElementById('profiles-container');
+
+            // Create a profile element
+            const profileElement = document.createElement('div');
+            profileElement.className = 'profile';
+            profileElement.innerHTML = `<img src="${imageUrl}" alt="${name}"><h2>${name}</h2><p>Address: ${address}</p><p>Blood Group: ${bloodGroup}</p><p>Total Blood: ${donations} Times</p>`;
+
+            // Append the profile to the container
+            profilesContainer.appendChild(profileElement);
+        }
+
+        // Call the function to fetch CSV data and create profiles
+        fetchCSVData();
+    </script>
+</body>
+</html>
